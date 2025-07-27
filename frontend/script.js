@@ -1,4 +1,4 @@
-/*  MindScope Enhanced - FIXED All Navigation & Display Issues */
+/*  MindScope Enhanced - Complete Frontend with User Data & Email Features */
 
 class MindScope {
     constructor() {
@@ -12,9 +12,21 @@ class MindScope {
         this.resultsPayload = null;
         this.assessmentMode = 'full';
 
+        // User demographics
+        this.userData = {
+            name: '',
+            email: '',
+            ageRange: '',
+            timestamp: null,
+            sessionId: this.generateSessionId()
+        };
+
         // Chart management
         this.currentChart = null;
         this.chartType = 'radar';
+
+        // Share data
+        this.shareData = null;
 
         this.init();
     }
@@ -30,11 +42,17 @@ class MindScope {
 
     bindGlobals() {
         window.showPage = (page) => this.showPage(page);
-        window.goHome = () => this.goHome(); // NEW: Fixed home navigation
+        window.goHome = () => this.goHome();
         window.scrollToAssessment = () => this.scrollToAssessment();
         window.previousQuestion = () => this.previousQuestion();
         window.nextQuestion = () => this.nextQuestion();
+        window.selectAge = (age) => this.selectAge(age);
+        window.proceedToAssessment = () => this.proceedToAssessment();
         window.mindScope = this;
+    }
+
+    generateSessionId() {
+        return 'session_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 5);
     }
 
     async loadQuestions() {
@@ -53,7 +71,7 @@ class MindScope {
     }
 
     // =================
-    // FIXED PAGE MANAGEMENT
+    // PAGE MANAGEMENT
     // =================
 
     showPage(pageId) {
@@ -71,7 +89,6 @@ class MindScope {
                 this.initializeResults();
             }
 
-            // FIXED: Always scroll to top properly
             setTimeout(() => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }, 100);
@@ -82,11 +99,9 @@ class MindScope {
         }
     }
 
-    // NEW: Fixed home navigation method
     goHome() {
         console.log('🏠 Going home with proper scroll');
         this.showPage('home');
-        // Force scroll to top
         setTimeout(() => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }, 200);
@@ -104,27 +119,101 @@ class MindScope {
         }, 100);
     }
 
+    // =================
+    // USER DATA COLLECTION
+    // =================
+
     async startAssessment(mode = 'full') {
-        console.log(`🎯 Starting ${mode} assessment`);
+        console.log(`🎯 Starting ${mode} assessment with user info collection`);
         this.assessmentMode = mode;
 
+        // Navigate to user info page first
+        this.showPage('user-info');
+    }
+
+    selectAge(ageRange) {
+        // Update radio button
+        document.querySelectorAll('.age-option input[type="radio"]').forEach(radio => {
+            radio.checked = radio.value === ageRange;
+        });
+
+        // Update visual selection
+        document.querySelectorAll('.age-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+
+        const selectedOption = document.querySelector(`input[value="${ageRange}"]`).closest('.age-option');
+        selectedOption.classList.add('selected');
+
+        // Store age range
+        this.userData.ageRange = ageRange;
+
+        // Check form completion
+        this.checkFormCompletion();
+
+        console.log('📅 Age selected:', ageRange);
+    }
+
+    checkFormCompletion() {
+        const name = document.getElementById('user-name').value.trim();
+        const email = document.getElementById('user-email').value.trim();
+        const ageSelected = this.userData.ageRange !== '';
+
+        const proceedBtn = document.getElementById('proceed-btn');
+
+        if (name && email && ageSelected && this.isValidEmail(email)) {
+            proceedBtn.disabled = false;
+            proceedBtn.classList.add('form-complete');
+        } else {
+            proceedBtn.disabled = true;
+            proceedBtn.classList.remove('form-complete');
+        }
+    }
+
+    isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    async proceedToAssessment() {
+        // Collect form data
+        const name = document.getElementById('user-name').value.trim();
+        const email = document.getElementById('user-email').value.trim();
+
+        // Validate form
+        if (!name || !email || !this.userData.ageRange || !this.isValidEmail(email)) {
+            alert('Please fill in all fields with valid information.');
+            return;
+        }
+
+        // Store user data
+        this.userData.name = name;
+        this.userData.email = email;
+        this.userData.timestamp = new Date().toISOString();
+
+        console.log('👤 User data collected:', this.userData);
+
+        // Save to backend
+        await this.saveUserData();
+
+        // Load questions and start assessment
         try {
-            const response = await fetch(`${this.apiBaseUrl}/questions?mode=${mode}`);
+            const response = await fetch(`${this.apiBaseUrl}/questions?mode=${this.assessmentMode}`);
             if (response.ok) {
                 this.questionsData = await response.json();
-                this.questions = this.processQuestionsForMode(this.questionsData, mode);
+                this.questions = this.processQuestionsForMode(this.questionsData, this.assessmentMode);
             } else {
-                this.questions = this.getFallbackQuestionsArray(mode);
+                this.questions = this.getFallbackQuestionsArray(this.assessmentMode);
             }
         } catch (error) {
-            console.warn('Using fallback questions for', mode);
-            this.questions = this.getFallbackQuestionsArray(mode);
+            console.warn('Using fallback questions for', this.assessmentMode);
+            this.questions = this.getFallbackQuestionsArray(this.assessmentMode);
         }
 
         this.currentIndex = 0;
         this.answers = {};
 
-        console.log(`📊 Loaded ${this.questions.length} questions for ${mode} mode`);
+        console.log(`📊 Loaded ${this.questions.length} questions for ${this.assessmentMode} mode`);
 
         this.showPage('assessment');
         this.updateAssessmentMode();
@@ -132,6 +221,31 @@ class MindScope {
         this.updateProgress();
         this.generateDots();
     }
+
+    async saveUserData() {
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/save-user-data`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(this.userData)
+            });
+
+            if (response.ok) {
+                console.log('✅ User data saved successfully');
+            } else {
+                console.warn('⚠️ Failed to save user data to backend');
+            }
+        } catch (error) {
+            console.warn('⚠️ Backend unavailable, user data stored locally only');
+        }
+
+        // Always store locally as backup
+        localStorage.setItem('mindscope-user-data', JSON.stringify(this.userData));
+    }
+
+    // =================
+    // ASSESSMENT FLOW
+    // =================
 
     processQuestionsForMode(data, mode) {
         let questions = [];
@@ -376,19 +490,27 @@ class MindScope {
         }
     }
 
+    // =================
+    // ASSESSMENT COMPLETION
+    // =================
+
     async completeAssessment() {
         console.log('🎉 Assessment completed!');
         this.showLoadingState();
 
         try {
+            const assessmentData = {
+                user_data: this.userData,
+                answers: this.answers,
+                mode: this.assessmentMode,
+                timestamp: new Date().toISOString(),
+                session_id: this.userData.sessionId
+            };
+
             const response = await fetch(`${this.apiBaseUrl}/assess`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    answers: this.answers,
-                    mode: this.assessmentMode,
-                    timestamp: new Date().toISOString()
-                })
+                body: JSON.stringify(assessmentData)
             });
 
             if (response.ok) {
@@ -401,6 +523,9 @@ class MindScope {
             console.warn('Using fallback results');
             this.resultsPayload = this.generateFallbackResults();
         }
+
+        // Include user data in results
+        this.resultsPayload.user_data = this.userData;
 
         localStorage.setItem('mindscope-results', JSON.stringify(this.resultsPayload));
         this.showPage('results');
@@ -614,7 +739,7 @@ class MindScope {
     }
 
     // =================
-    // ENHANCED RESULTS PAGE WITH FORCED DISPLAY
+    // RESULTS PAGE WITH CHARTS
     // =================
 
     initializeResults() {
@@ -631,20 +756,17 @@ class MindScope {
             }
         }
 
-        // FIXED: Force display with timeout to ensure DOM is ready
         setTimeout(() => {
             this.renderResults();
             this.renderChart();
             this.animateResults();
-            this.forceDisplayResults(); // NEW: Force display method
+            this.forceDisplayResults();
         }, 100);
     }
 
-    // NEW: Force display method
     forceDisplayResults() {
         console.log('🔧 Forcing results display...');
 
-        // Force show results grid
         const resultsGrid = document.getElementById('results-grid');
         if (resultsGrid) {
             resultsGrid.style.display = 'grid';
@@ -653,7 +775,6 @@ class MindScope {
             console.log('✅ Results grid forced visible');
         }
 
-        // Force show recommendations
         const recommendations = document.getElementById('recommendations');
         if (recommendations) {
             recommendations.style.display = 'block';
@@ -662,7 +783,6 @@ class MindScope {
             console.log('✅ Recommendations forced visible');
         }
 
-        // Force show all result cards
         document.querySelectorAll('.result-card').forEach((card, index) => {
             card.style.display = 'flex';
             card.style.visibility = 'visible';
@@ -670,7 +790,6 @@ class MindScope {
             card.style.animationDelay = `${index * 0.15}s`;
         });
 
-        // Force show all recommendation cards
         document.querySelectorAll('.recommendation-card').forEach((card, index) => {
             card.style.display = 'flex';
             card.style.visibility = 'visible';
@@ -917,97 +1036,88 @@ class MindScope {
         }, 500);
     }
 
-    getFallbackQuestions() {
-        return {
-            title: "Mental Health Check-in",
-            mode: "full",
-            total_questions: 6,
-            sections: [
-                {
-                    category: "Mind & Mood",
-                    questions: [
-                        { id: "phq_1", text: "Little interest or pleasure in doing things?", options_id: "spectrum_0_3" },
-                        { id: "gad_1", text: "Feeling nervous, anxious, or on edge?", options_id: "spectrum_0_3" },
-                        { id: "phq_2", text: "Feeling down, depressed, or hopeless?", options_id: "spectrum_0_3" }
-                    ]
-                },
-                {
-                    category: "Wellbeing",
-                    questions: [
-                        { id: "who_1", text: "I have felt cheerful and in good spirits?", options_id: "wellbeing_0_5" },
-                        { id: "who_2", text: "I have felt calm and relaxed?", options_id: "wellbeing_0_5" },
-                        { id: "who_3", text: "I have felt active and vigorous?", options_id: "wellbeing_0_5" }
-                    ]
-                }
-            ],
-            option_sets: {
-                spectrum_0_3: [
-                    { label: "Not at all", value: 0, emoji: "😌" },
-                    { label: "Several days", value: 1, emoji: "🌊" },
-                    { label: "More than half the days", value: 2, emoji: "🌪️" },
-                    { label: "Nearly every day", value: 3, emoji: "🚨" }
-                ],
-                wellbeing_0_5: [
-                    { label: "All of the time", value: 5, emoji: "🌟" },
-                    { label: "Most of the time", value: 4, emoji: "😊" },
-                    { label: "More than half of the time", value: 3, emoji: "⚖️" },
-                    { label: "Less than half of the time", value: 2, emoji: "☁️" },
-                    { label: "Some of the time", value: 1, emoji: "🌑" },
-                    { label: "At no time", value: 0, emoji: "🌑" }
-                ]
+    // =================
+    // EMAIL FUNCTIONALITY
+    // =================
+
+    async emailResults() {
+        console.log('📧 Preparing to email results...');
+
+        if (!this.userData.email) {
+            alert('No email address found. Please retake the assessment.');
+            return;
+        }
+
+        const button = document.querySelector('[onclick*="emailResults"]');
+        const originalText = button.innerHTML;
+
+        try {
+            button.innerHTML = '<div class="spinner" style="width:16px;height:16px;margin-right:8px;"></div>Sending Email...';
+            button.disabled = true;
+
+            const emailData = {
+                user_data: this.userData,
+                results: this.resultsPayload,
+                email_type: 'results'
+            };
+
+            const response = await fetch(`${this.apiBaseUrl}/send-email`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(emailData)
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                this.showEmailSuccess(button, originalText);
+                console.log('✅ Email sent successfully:', result);
+            } else {
+                throw new Error('Email sending failed');
             }
-        };
+
+        } catch (error) {
+            console.error('❌ Email sending failed:', error);
+            this.showEmailError(button, originalText);
+        }
     }
 
-    getFallbackQuestionsArray(mode) {
-        const data = this.getFallbackQuestions();
-        return this.processQuestionsForMode(data, mode);
+    showEmailSuccess(button, originalText) {
+        button.innerHTML = '✅ Email Sent!';
+        button.style.background = 'var(--gradient-success)';
+
+        setTimeout(() => {
+            button.innerHTML = originalText;
+            button.style.background = '';
+            button.disabled = false;
+        }, 3000);
     }
 
-    setupEventListeners() {
-        document.addEventListener('keydown', (e) => {
-            const activePage = document.querySelector('.page.active')?.id;
-            if (activePage !== 'assessment-page') return;
+    showEmailError(button, originalText) {
+        button.innerHTML = '❌ Email Failed';
+        button.style.background = 'var(--danger)';
 
-            switch (e.key) {
-                case 'ArrowLeft':
-                    e.preventDefault();
-                    this.previousQuestion();
-                    break;
-                case 'ArrowRight':
-                    e.preventDefault();
-                    this.nextQuestion();
-                    break;
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                    e.preventDefault();
-                    const optionIndex = parseInt(e.key) - 1;
-                    const options = document.querySelectorAll('.answer-option');
-                    if (options[optionIndex]) {
-                        options[optionIndex].click();
-                    }
-                    break;
-            }
-        });
+        setTimeout(() => {
+            button.innerHTML = originalText;
+            button.style.background = '';
+            button.disabled = false;
+        }, 3000);
+
+        alert('Failed to send email. Please try downloading the PDF instead.');
     }
 
-    // Add this to your existing MindScope class - replace the placeholder exportPDF method
+    // =================
+    // PDF EXPORT
+    // =================
 
     async exportPDF() {
         console.log('📄 Generating branded PDF report...');
 
         try {
-            // Show loading state
             const button = document.querySelector('[onclick*="exportPDF"]');
             const originalText = button.innerHTML;
             button.innerHTML = '<div class="spinner" style="width:16px;height:16px;margin-right:8px;"></div>Generating PDF...';
             button.disabled = true;
 
-            // Wait for jsPDF to be available
             if (typeof window.jspdf === 'undefined') {
                 throw new Error('jsPDF library not loaded');
             }
@@ -1015,29 +1125,18 @@ class MindScope {
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p', 'mm', 'a4');
 
-            // Add branded header
             await this.addPDFHeader(pdf);
-
-            // Add content sections
             let yPos = await this.addPDFOverallScore(pdf, 50);
             yPos = await this.addPDFResultsBreakdown(pdf, yPos + 10);
             yPos = await this.addPDFRecommendations(pdf, yPos + 10);
-
-            // Add chart if possible
             await this.addPDFChart(pdf, yPos + 10);
-
-            // Add footer
             this.addPDFFooter(pdf);
 
-            // Generate filename with timestamp
             const timestamp = new Date().toISOString().split('T')[0];
             const mode = this.assessmentMode === 'quick' ? 'Quick' : 'Complete';
             const filename = `MindScope_${mode}_Report_${timestamp}.pdf`;
 
-            // Save PDF
             pdf.save(filename);
-
-            // Success feedback
             this.showPDFSuccess(button, originalText);
 
             console.log('✅ PDF exported successfully:', filename);
@@ -1049,43 +1148,35 @@ class MindScope {
     }
 
     addPDFHeader(pdf) {
-        // Gradient background effect (simulated with rectangles)
-        pdf.setFillColor(99, 102, 241); // Primary blue
+        pdf.setFillColor(99, 102, 241);
         pdf.rect(0, 0, 210, 45, 'F');
 
-        // Darker overlay for text readability
         pdf.setFillColor(26, 26, 46, 0.8);
         pdf.rect(0, 0, 210, 45, 'F');
 
-        // MindScope Logo Area (circle placeholder)
         pdf.setFillColor(255, 255, 255);
         pdf.circle(25, 22, 10, 'F');
         pdf.setFillColor(99, 102, 241);
         pdf.circle(25, 22, 8, 'F');
 
-        // Add checkmark in logo
         pdf.setDrawColor(255, 255, 255);
         pdf.setLineWidth(1.5);
         pdf.line(20, 22, 23, 25);
         pdf.line(23, 25, 30, 18);
 
-        // Main Title
         pdf.setTextColor(255, 255, 255);
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(28);
         pdf.text('MindScope', 45, 20);
 
-        // Subtitle
         pdf.setFontSize(12);
         pdf.setFont('helvetica', 'normal');
         pdf.text('Mental Wellness Assessment Report', 45, 28);
 
-        // Assessment mode badge
         const mode = this.assessmentMode === 'quick' ? 'Quick Check-in' : 'Complete Assessment';
         pdf.setFontSize(10);
         pdf.text(`${mode} • Generated by AI`, 45, 35);
 
-        // Date and time
         const now = new Date();
         const dateStr = now.toLocaleDateString('en-IN', {
             year: 'numeric',
@@ -1109,17 +1200,14 @@ class MindScope {
     async addPDFOverallScore(pdf, yPos) {
         const overallScore = this.resultsPayload?.overall_score || 75;
 
-        // Section header
         pdf.setTextColor(0, 0, 0);
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(16);
         pdf.text('Overall Wellness Score', 20, yPos);
 
-        // Score circle background
         pdf.setFillColor(99, 102, 241);
         pdf.circle(40, yPos + 20, 15, 'F');
 
-        // Score text
         pdf.setTextColor(255, 255, 255);
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(24);
@@ -1127,7 +1215,6 @@ class MindScope {
         const textWidth = pdf.getTextWidth(scoreText);
         pdf.text(scoreText, 40 - (textWidth/2), yPos + 24);
 
-        // Score interpretation
         pdf.setTextColor(0, 0, 0);
         pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(12);
@@ -1152,51 +1239,43 @@ class MindScope {
     async addPDFResultsBreakdown(pdf, yPos) {
         const results = this.resultsPayload?.results || {};
 
-        // Check if we need a new page
         if (yPos > 220) {
             pdf.addPage();
             yPos = 20;
         }
 
-        // Section header
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(14);
         pdf.text('Detailed Assessment Results', 20, yPos);
         yPos += 10;
 
         Object.entries(results).forEach(([key, result], index) => {
-            // Check for page break
             if (yPos > 250) {
                 pdf.addPage();
                 yPos = 20;
             }
 
-            // Category name
             pdf.setFont('helvetica', 'bold');
             pdf.setFontSize(12);
             pdf.text(result.name, 20, yPos);
 
-            // Score and level
             pdf.setFont('helvetica', 'normal');
             pdf.setFontSize(10);
             pdf.text(`${result.score}% - ${result.level}`, 120, yPos);
 
-            // Progress bar background
             pdf.setFillColor(240, 240, 240);
             pdf.rect(20, yPos + 3, 80, 4, 'F');
 
-            // Progress bar fill
             const fillWidth = (80 * result.score / 100);
             if (result.level.includes('High') && !result.level.includes('Well')) {
-                pdf.setFillColor(239, 68, 68); // Red for concerns
+                pdf.setFillColor(239, 68, 68);
             } else if (result.level.includes('Moderate')) {
-                pdf.setFillColor(245, 158, 11); // Orange for moderate
+                pdf.setFillColor(245, 158, 11);
             } else {
-                pdf.setFillColor(16, 185, 129); // Green for good
+                pdf.setFillColor(16, 185, 129);
             }
             pdf.rect(20, yPos + 3, fillWidth, 4, 'F');
 
-            // Description
             pdf.setFontSize(9);
             pdf.setTextColor(80, 80, 80);
             const descLines = pdf.splitTextToSize(result.description, 170);
@@ -1212,42 +1291,35 @@ class MindScope {
     async addPDFRecommendations(pdf, yPos) {
         const recommendations = this.resultsPayload?.recommendations || [];
 
-        // Check if we need a new page
         if (yPos > 200) {
             pdf.addPage();
             yPos = 20;
         }
 
-        // Section header
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(14);
         pdf.text('Personalized Recommendations', 20, yPos);
         yPos += 15;
 
         recommendations.forEach((rec, index) => {
-            // Check for page break
             if (yPos > 240) {
                 pdf.addPage();
                 yPos = 20;
             }
 
-            // Icon background
             pdf.setFillColor(99, 102, 241);
             pdf.circle(25, yPos + 2, 4, 'F');
 
-            // Icon (simplified)
             pdf.setTextColor(255, 255, 255);
             pdf.setFont('helvetica', 'bold');
             pdf.setFontSize(8);
             pdf.text((index + 1).toString(), 23, yPos + 4);
 
-            // Title
             pdf.setTextColor(0, 0, 0);
             pdf.setFont('helvetica', 'bold');
             pdf.setFontSize(11);
             pdf.text(rec.title, 35, yPos + 4);
 
-            // Description
             pdf.setFont('helvetica', 'normal');
             pdf.setFontSize(9);
             pdf.setTextColor(60, 60, 60);
@@ -1268,22 +1340,17 @@ class MindScope {
                 return yPos;
             }
 
-            // Check if we need a new page
             if (yPos > 180) {
                 pdf.addPage();
                 yPos = 20;
             }
 
-            // Add chart title
             pdf.setFont('helvetica', 'bold');
             pdf.setFontSize(12);
             pdf.text('Visual Results Summary', 20, yPos);
             yPos += 10;
 
-            // Convert chart to image
             const chartImage = canvas.toDataURL('image/png', 0.8);
-
-            // Add chart image to PDF
             pdf.addImage(chartImage, 'PNG', 20, yPos, 120, 80);
 
             return yPos + 90;
@@ -1299,19 +1366,14 @@ class MindScope {
         for (let i = 1; i <= pageCount; i++) {
             pdf.setPage(i);
 
-            // Footer background
             pdf.setFillColor(248, 250, 252);
             pdf.rect(0, 285, 210, 12, 'F');
 
-            // Footer text
             pdf.setTextColor(100, 100, 100);
             pdf.setFont('helvetica', 'normal');
             pdf.setFontSize(8);
 
-            // Disclaimer
             pdf.text('This report is for informational purposes only and should not replace professional medical advice.', 20, 290);
-
-            // Website and page number
             pdf.text('Visit mindscope-by-yt.vercel.app for more resources', 20, 294);
             pdf.text(`Page ${i} of ${pageCount}`, 180, 294);
         }
@@ -1344,19 +1406,16 @@ class MindScope {
         alert('PDF export failed. Please try again or check your browser compatibility.');
     }
 
-    // Replace the placeholder shareResults method with this complete implementation
+    // =================
+    // SOCIAL SHARING
+    // =================
 
     async shareResults() {
         console.log('🔗 Preparing social sharing...');
 
         try {
-            // Generate share data
             this.shareData = await this.generateShareData();
-
-            // Update modal content
             this.updateShareModal();
-
-            // Show share modal
             this.showShareModal();
 
         } catch (error) {
@@ -1370,13 +1429,9 @@ class MindScope {
         const mode = this.assessmentMode === 'quick' ? 'Quick' : 'Complete';
         const timestamp = new Date().toISOString();
 
-        // Create shareable insights
         const insights = this.generateShareableInsights();
-
-        // Generate anonymous share ID
         const shareId = this.generateShareId();
 
-        // Try to create backend share link
         let shareUrl = `${window.location.origin}/#shared-${shareId}`;
 
         try {
@@ -1400,7 +1455,6 @@ class MindScope {
             console.warn('Backend share creation failed, using client-side sharing');
         }
 
-        // Create social media texts
         const socialTexts = {
             twitter: `I just completed a ${mode.toLowerCase()} mental wellness assessment on MindScope! 🧠✨\n\n${insights.summary}\n\nTake yours: ${shareUrl} #MentalHealth #Wellness`,
 
@@ -1426,7 +1480,6 @@ class MindScope {
         const results = this.resultsPayload?.results || {};
         const overallScore = this.resultsPayload?.overall_score || 75;
 
-        // Find strongest and areas for growth
         const scores = Object.values(results).map(r => ({ name: r.name, score: r.score, level: r.level }));
         const strongest = scores.reduce((prev, current) => (prev.score > current.score) ? prev : current);
         const growthArea = scores.reduce((prev, current) => (prev.score < current.score) ? prev : current);
@@ -1460,7 +1513,7 @@ class MindScope {
         const modal = document.getElementById('share-modal');
         if (modal) {
             modal.classList.add('active');
-            document.body.style.overflow = 'hidden'; // Prevent background scroll
+            document.body.style.overflow = 'hidden';
         }
     }
 
@@ -1468,11 +1521,10 @@ class MindScope {
         const modal = document.getElementById('share-modal');
         if (modal) {
             modal.classList.remove('active');
-            document.body.style.overflow = ''; // Restore scroll
+            document.body.style.overflow = '';
         }
     }
 
-    // Social platform specific sharing methods
     shareToTwitter() {
         if (!this.shareData) return;
 
@@ -1522,7 +1574,6 @@ class MindScope {
             `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
         );
 
-        // Track sharing (you can add analytics here)
         console.log(`📱 Shared to ${platform}`);
     }
 
@@ -1532,7 +1583,6 @@ class MindScope {
         try {
             await navigator.clipboard.writeText(this.shareData.shareUrl);
 
-            // Success feedback
             const button = document.querySelector('.share-btn.copy');
             if (button) {
                 const originalContent = button.innerHTML;
@@ -1552,14 +1602,13 @@ class MindScope {
         } catch (error) {
             console.error('Failed to copy link:', error);
 
-            // Fallback: Select the text in the input
             const shareInput = document.getElementById('share-link-input');
             if (shareInput) {
                 shareInput.select();
-                shareInput.setSelectionRange(0, 99999); // For mobile devices
+                shareInput.setSelectionRange(0, 99999);
 
                 try {
-                    document.execCommand('copy'); // Fallback for older browsers
+                    document.execCommand('copy');
                     alert('Link copied to clipboard!');
                 } catch (fallbackError) {
                     alert('Please manually copy the link from the text field.');
@@ -1568,7 +1617,6 @@ class MindScope {
         }
     }
 
-    // Add native Web Share API support for mobile devices
     async shareNative() {
         if (!this.shareData) return;
 
@@ -1585,11 +1633,99 @@ class MindScope {
                 console.log('Native sharing cancelled or failed:', error);
             }
         } else {
-            // Fallback to copy link
             this.copyShareLink();
         }
     }
 
+    // =================
+    // FALLBACK DATA
+    // =================
+
+    getFallbackQuestions() {
+        return {
+            title: "Mental Health Check-in",
+            mode: "full",
+            total_questions: 6,
+            sections: [
+                {
+                    category: "Mind & Mood",
+                    questions: [
+                        { id: "phq_1", text: "Little interest or pleasure in doing things?", options_id: "spectrum_0_3" },
+                        { id: "gad_1", text: "Feeling nervous, anxious, or on edge?", options_id: "spectrum_0_3" },
+                        { id: "phq_2", text: "Feeling down, depressed, or hopeless?", options_id: "spectrum_0_3" }
+                    ]
+                },
+                {
+                    category: "Wellbeing",
+                    questions: [
+                        { id: "who_1", text: "I have felt cheerful and in good spirits?", options_id: "wellbeing_0_5" },
+                        { id: "who_2", text: "I have felt calm and relaxed?", options_id: "wellbeing_0_5" },
+                        { id: "who_3", text: "I have felt active and vigorous?", options_id: "wellbeing_0_5" }
+                    ]
+                }
+            ],
+            option_sets: {
+                spectrum_0_3: [
+                    { label: "Not at all", value: 0, emoji: "😌" },
+                    { label: "Several days", value: 1, emoji: "🌊" },
+                    { label: "More than half the days", value: 2, emoji: "🌪️" },
+                    { label: "Nearly every day", value: 3, emoji: "🚨" }
+                ],
+                wellbeing_0_5: [
+                    { label: "All of the time", value: 5, emoji: "🌟" },
+                    { label: "Most of the time", value: 4, emoji: "😊" },
+                    { label: "More than half of the time", value: 3, emoji: "⚖️" },
+                    { label: "Less than half of the time", value: 2, emoji: "☁️" },
+                    { label: "Some of the time", value: 1, emoji: "🌑" },
+                    { label: "At no time", value: 0, emoji: "🌑" }
+                ]
+            }
+        };
+    }
+
+    getFallbackQuestionsArray(mode) {
+        const data = this.getFallbackQuestions();
+        return this.processQuestionsForMode(data, mode);
+    }
+
+    setupEventListeners() {
+        // Form validation listeners
+        document.addEventListener('input', (e) => {
+            if (e.target.id === 'user-name' || e.target.id === 'user-email') {
+                this.checkFormCompletion();
+            }
+        });
+
+        // Keyboard navigation for assessment
+        document.addEventListener('keydown', (e) => {
+            const activePage = document.querySelector('.page.active')?.id;
+            if (activePage !== 'assessment-page') return;
+
+            switch (e.key) {
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    this.previousQuestion();
+                    break;
+                case 'ArrowRight':
+                    e.preventDefault();
+                    this.nextQuestion();
+                    break;
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                    e.preventDefault();
+                    const optionIndex = parseInt(e.key) - 1;
+                    const options = document.querySelectorAll('.answer-option');
+                    if (options[optionIndex]) {
+                        options[optionIndex].click();
+                    }
+                    break;
+            }
+        });
+    }
 }
 
 // Initialize MindScope when DOM is ready

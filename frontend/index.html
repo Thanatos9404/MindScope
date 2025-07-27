@@ -128,6 +128,137 @@
         </div>
     </section>
 
+    <!-- User Information Page -->
+    <section id="user-info-page" class="page">
+        <div class="user-info-container">
+            <div class="container">
+                <div class="user-info-header">
+                    <div class="info-icon">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                            <circle cx="24" cy="24" r="20" stroke="url(#logoGradient)" stroke-width="2" fill="none"/>
+                            <path d="M24 16c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 14c-4.42 0-8 1.79-8 4v2h16v-2c0-2.21-3.58-4-8-4z" fill="url(#logoGradient)"/>
+                        </svg>
+                    </div>
+                    <h1>Tell Us About Yourself</h1>
+                    <p class="info-subtitle">
+                        Help us personalize your experience and contribute to mental health research.
+                        Your information is completely confidential and secure.
+                    </p>
+                </div>
+
+                <div class="user-info-form">
+                    <form id="demographics-form" onsubmit="return false;">
+                        <!-- Name Field -->
+                        <div class="form-group">
+                            <label for="user-name">
+                                <span class="label-icon">👤</span>
+                                Your Name
+                            </label>
+                            <input
+                                type="text"
+                                id="user-name"
+                                name="name"
+                                placeholder="Enter your first name"
+                                required
+                                autocomplete="given-name"
+                            >
+                            <small class="field-help">Only your first name is needed</small>
+                        </div>
+
+                        <!-- Email Field -->
+                        <div class="form-group">
+                            <label for="user-email">
+                                <span class="label-icon">📧</span>
+                                Email Address
+                            </label>
+                            <input
+                                type="email"
+                                id="user-email"
+                                name="email"
+                                placeholder="your.email@example.com"
+                                required
+                                autocomplete="email"
+                            >
+                            <small class="field-help">We'll send your results here (optional future emails)</small>
+                        </div>
+
+                        <!-- Age Range Selection -->
+                        <div class="form-group">
+                            <label>
+                                <span class="label-icon">📅</span>
+                                Age Range
+                            </label>
+                            <div class="age-options">
+                                <div class="age-option" onclick="selectAge('0-17')">
+                                    <input type="radio" id="age-0-17" name="age-range" value="0-17">
+                                    <label for="age-0-17">
+                                        <span class="age-emoji">🧒</span>
+                                        <span class="age-label">Under 18</span>
+                                        <span class="age-range">0-17 years</span>
+                                    </label>
+                                </div>
+
+                                <div class="age-option" onclick="selectAge('18-26')">
+                                    <input type="radio" id="age-18-26" name="age-range" value="18-26">
+                                    <label for="age-18-26">
+                                        <span class="age-emoji">🧑</span>
+                                        <span class="age-label">Young Adult</span>
+                                        <span class="age-range">18-26 years</span>
+                                    </label>
+                                </div>
+
+                                <div class="age-option" onclick="selectAge('27-40')">
+                                    <input type="radio" id="age-27-40" name="age-range" value="27-40">
+                                    <label for="age-27-40">
+                                        <span class="age-emoji">👨</span>
+                                        <span class="age-label">Adult</span>
+                                        <span class="age-range">27-40 years</span>
+                                    </label>
+                                </div>
+
+                                <div class="age-option" onclick="selectAge('41+')">
+                                    <input type="radio" id="age-41+" name="age-range" value="41+">
+                                    <label for="age-41+">
+                                        <span class="age-emoji">👴</span>
+                                        <span class="age-label">Mature Adult</span>
+                                        <span class="age-range">41+ years</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <small class="field-help">Select your age group for personalized insights</small>
+                        </div>
+
+                        <!-- Privacy Notice -->
+                        <div class="privacy-notice">
+                            <div class="privacy-icon">🔒</div>
+                            <div class="privacy-text">
+                                <strong>Your Privacy Matters</strong>
+                                <p>Your personal information is encrypted and stored securely. We use this data only to personalize your experience and improve our mental health insights. You can request data deletion anytime.</p>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="showPage('home')">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                </svg>
+                                Back to Home
+                            </button>
+
+                            <button type="button" class="btn btn-primary" onclick="proceedToAssessment()" id="proceed-btn" disabled>
+                                Continue to Assessment
+                                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Assessment Page -->
     <section id="assessment-page" class="page">
         <div class="assessment-container">
@@ -257,6 +388,14 @@
                         Download Report
                     </button>
 
+                    <!-- Email Results Button -->
+                    <button class="btn btn-primary" onclick="mindScope.emailResults()">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 3.26a2 2 0 001.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        Email Results
+                    </button>
+
                     <button class="btn btn-secondary" onclick="mindScope.shareResults()">
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"/>
@@ -264,7 +403,7 @@
                         Share Results
                     </button>
 
-                    <button class="btn btn-primary" onclick="goHome()">
+                    <button class="btn btn-ghost" onclick="goHome()">
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                         </svg>

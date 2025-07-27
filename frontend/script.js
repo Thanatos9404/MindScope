@@ -1641,26 +1641,71 @@ class MindScope {
     // FALLBACK DATA
     // =================
 
+    // Replace the getFallbackQuestions method in your script.js
     getFallbackQuestions() {
         return {
-            title: "Mental Health Check-in",
+            title: "Mental Health Assessment",
             mode: "full",
-            total_questions: 6,
+            total_questions: 35,
             sections: [
                 {
-                    category: "Mind & Mood",
+                    category: "Depression & Mood",
                     questions: [
                         { id: "phq_1", text: "Little interest or pleasure in doing things?", options_id: "spectrum_0_3" },
-                        { id: "gad_1", text: "Feeling nervous, anxious, or on edge?", options_id: "spectrum_0_3" },
-                        { id: "phq_2", text: "Feeling down, depressed, or hopeless?", options_id: "spectrum_0_3" }
+                        { id: "phq_2", text: "Feeling down, depressed, or hopeless?", options_id: "spectrum_0_3" },
+                        { id: "phq_3", text: "Trouble falling or staying asleep, or sleeping too much?", options_id: "spectrum_0_3" },
+                        { id: "phq_4", text: "Feeling tired or having little energy?", options_id: "spectrum_0_3" },
+                        { id: "phq_5", text: "Poor appetite or overeating?", options_id: "spectrum_0_3" },
+                        { id: "phq_6", text: "Feeling bad about yourself or that you are a failure?", options_id: "spectrum_0_3" },
+                        { id: "phq_7", text: "Trouble concentrating on things, such as reading or watching TV?", options_id: "spectrum_0_3" },
+                        { id: "phq_8", text: "Moving or speaking so slowly that other people could have noticed?", options_id: "spectrum_0_3" },
+                        { id: "phq_9", text: "Thoughts that you would be better off dead, or of hurting yourself?", options_id: "spectrum_0_3" }
                     ]
                 },
                 {
-                    category: "Wellbeing",
+                    category: "Anxiety",
+                    questions: [
+                        { id: "gad_1", text: "Feeling nervous, anxious, or on edge?", options_id: "spectrum_0_3" },
+                        { id: "gad_2", text: "Not being able to stop or control worrying?", options_id: "spectrum_0_3" },
+                        { id: "gad_3", text: "Worrying too much about different things?", options_id: "spectrum_0_3" },
+                        { id: "gad_4", text: "Trouble relaxing?", options_id: "spectrum_0_3" },
+                        { id: "gad_5", text: "Being so restless that it's hard to sit still?", options_id: "spectrum_0_3" },
+                        { id: "gad_6", text: "Becoming easily annoyed or irritable?", options_id: "spectrum_0_3" },
+                        { id: "gad_7", text: "Feeling afraid, as if something awful might happen?", options_id: "spectrum_0_3" }
+                    ]
+                },
+                {
+                    category: "Stress & Coping",
+                    questions: [
+                        { id: "stress_1", text: "I have been upset because of something that happened unexpectedly?", options_id: "stress_0_4" },
+                        { id: "stress_2", text: "I have felt that I was unable to control the important things in my life?", options_id: "stress_0_4" },
+                        { id: "stress_3", text: "I have felt nervous and stressed?", options_id: "stress_0_4" },
+                        { id: "stress_4", text: "I have felt confident about my ability to handle my personal problems?", options_id: "stress_0_4" },
+                        { id: "stress_5", text: "I have felt that things were going my way?", options_id: "stress_0_4" },
+                        { id: "stress_6", text: "I have found that I could not cope with all the things I had to do?", options_id: "stress_0_4" }
+                    ]
+                },
+                {
+                    category: "Sleep & Energy",
+                    questions: [
+                        { id: "sleep_1", text: "Do you typically get enough hours of sleep?", options_id: "sleep_yes_no" },
+                        { id: "sleep_2", text: "How often do you have trouble falling asleep?", options_id: "frequency_0_4" },
+                        { id: "sleep_3", text: "How often do you wake up during the night?", options_id: "frequency_0_4" },
+                        { id: "sleep_4", text: "How refreshed do you feel when you wake up?", options_id: "refreshed_0_4" },
+                        { id: "energy_1", text: "How would you rate your overall energy levels?", options_id: "energy_0_4" }
+                    ]
+                },
+                {
+                    category: "Wellbeing & Social",
                     questions: [
                         { id: "who_1", text: "I have felt cheerful and in good spirits?", options_id: "wellbeing_0_5" },
                         { id: "who_2", text: "I have felt calm and relaxed?", options_id: "wellbeing_0_5" },
-                        { id: "who_3", text: "I have felt active and vigorous?", options_id: "wellbeing_0_5" }
+                        { id: "who_3", text: "I have felt active and vigorous?", options_id: "wellbeing_0_5" },
+                        { id: "who_4", text: "I woke up feeling fresh and rested?", options_id: "wellbeing_0_5" },
+                        { id: "who_5", text: "My daily life has been filled with things that interest me?", options_id: "wellbeing_0_5" },
+                        { id: "social_1", text: "How satisfied are you with your relationships?", options_id: "satisfaction_0_4" },
+                        { id: "social_2", text: "How often do you feel lonely?", options_id: "frequency_0_4" },
+                        { id: "social_3", text: "Do you feel you have adequate social support?", options_id: "support_0_4" }
                     ]
                 }
             ],
@@ -1677,9 +1722,143 @@ class MindScope {
                     { label: "More than half of the time", value: 3, emoji: "⚖️" },
                     { label: "Less than half of the time", value: 2, emoji: "☁️" },
                     { label: "Some of the time", value: 1, emoji: "🌑" },
-                    { label: "At no time", value: 0, emoji: "🌑" }
+                    { label: "At no time", value: 0, emoji: "😔" }
+                ],
+                stress_0_4: [
+                    { label: "Never", value: 0, emoji: "🧘" },
+                    { label: "Almost never", value: 1, emoji: "😌" },
+                    { label: "Sometimes", value: 2, emoji: "😐" },
+                    { label: "Fairly often", value: 3, emoji: "😰" },
+                    { label: "Very often", value: 4, emoji: "🤯" }
+                ],
+                frequency_0_4: [
+                    { label: "Never", value: 0, emoji: "✅" },
+                    { label: "Rarely", value: 1, emoji: "🔹" },
+                    { label: "Sometimes", value: 2, emoji: "🔸" },
+                    { label: "Often", value: 3, emoji: "🔶" },
+                    { label: "Always", value: 4, emoji: "🔴" }
+                ],
+                sleep_yes_no: [
+                    { label: "Yes, always enough", value: 5, emoji: "😴" },
+                    { label: "Usually enough", value: 4, emoji: "🛌" },
+                    { label: "Sometimes enough", value: 3, emoji: "😪" },
+                    { label: "Rarely enough", value: 2, emoji: "😴" },
+                    { label: "Never enough", value: 1, emoji: "🥱" }
+                ],
+                refreshed_0_4: [
+                    { label: "Very refreshed", value: 4, emoji: "🌅" },
+                    { label: "Somewhat refreshed", value: 3, emoji: "☀️" },
+                    { label: "Neutral", value: 2, emoji: "😐" },
+                    { label: "Somewhat tired", value: 1, emoji: "😪" },
+                    { label: "Very tired", value: 0, emoji: "😵" }
+                ],
+                energy_0_4: [
+                    { label: "Very high energy", value: 4, emoji: "⚡" },
+                    { label: "Good energy", value: 3, emoji: "💪" },
+                    { label: "Moderate energy", value: 2, emoji: "🔋" },
+                    { label: "Low energy", value: 1, emoji: "🪫" },
+                    { label: "Very low energy", value: 0, emoji: "😴" }
+                ],
+                satisfaction_0_4: [
+                    { label: "Very satisfied", value: 4, emoji: "🥰" },
+                    { label: "Satisfied", value: 3, emoji: "😊" },
+                    { label: "Neutral", value: 2, emoji: "😐" },
+                    { label: "Dissatisfied", value: 1, emoji: "😕" },
+                    { label: "Very dissatisfied", value: 0, emoji: "😢" }
+                ],
+                support_0_4: [
+                    { label: "Excellent support", value: 4, emoji: "🤗" },
+                    { label: "Good support", value: 3, emoji: "👥" },
+                    { label: "Adequate support", value: 2, emoji: "🤝" },
+                    { label: "Limited support", value: 1, emoji: "🙋" },
+                    { label: "No support", value: 0, emoji: "😞" }
                 ]
-            }
+            },
+            quick_questions: [
+                { id: "phq_1", text: "Little interest or pleasure in doing things?", options: [
+                    { label: "Not at all", value: 0, emoji: "😌" },
+                    { label: "Several days", value: 1, emoji: "🌊" },
+                    { label: "More than half the days", value: 2, emoji: "🌪️" },
+                    { label: "Nearly every day", value: 3, emoji: "🚨" }
+                ], section_name: "Mood" },
+                { id: "gad_1", text: "Feeling nervous, anxious, or on edge?", options: [
+                    { label: "Not at all", value: 0, emoji: "😌" },
+                    { label: "Several days", value: 1, emoji: "🌊" },
+                    { label: "More than half the days", value: 2, emoji: "🌪️" },
+                    { label: "Nearly every day", value: 3, emoji: "🚨" }
+                ], section_name: "Anxiety" },
+                { id: "stress_1", text: "I have felt nervous and stressed?", options: [
+                    { label: "Never", value: 0, emoji: "🧘" },
+                    { label: "Almost never", value: 1, emoji: "😌" },
+                    { label: "Sometimes", value: 2, emoji: "😐" },
+                    { label: "Fairly often", value: 3, emoji: "😰" },
+                    { label: "Very often", value: 4, emoji: "🤯" }
+                ], section_name: "Stress" },
+                { id: "sleep_1", text: "Do you typically get enough hours of sleep?", options: [
+                    { label: "Yes, always enough", value: 5, emoji: "😴" },
+                    { label: "Usually enough", value: 4, emoji: "🛌" },
+                    { label: "Sometimes enough", value: 3, emoji: "😪" },
+                    { label: "Rarely enough", value: 2, emoji: "😴" },
+                    { label: "Never enough", value: 1, emoji: "🥱" }
+                ], section_name: "Sleep" },
+                { id: "who_1", text: "I have felt cheerful and in good spirits?", options: [
+                    { label: "All of the time", value: 5, emoji: "🌟" },
+                    { label: "Most of the time", value: 4, emoji: "😊" },
+                    { label: "More than half of the time", value: 3, emoji: "⚖️" },
+                    { label: "Less than half of the time", value: 2, emoji: "☁️" },
+                    { label: "Some of the time", value: 1, emoji: "🌑" },
+                    { label: "At no time", value: 0, emoji: "😔" }
+                ], section_name: "Wellbeing" },
+                { id: "who_2", text: "I have felt calm and relaxed?", options: [
+                    { label: "All of the time", value: 5, emoji: "🌟" },
+                    { label: "Most of the time", value: 4, emoji: "😊" },
+                    { label: "More than half of the time", value: 3, emoji: "⚖️" },
+                    { label: "Less than half of the time", value: 2, emoji: "☁️" },
+                    { label: "Some of the time", value: 1, emoji: "🌑" },
+                    { label: "At no time", value: 0, emoji: "😔" }
+                ], section_name: "Wellbeing" },
+                { id: "social_1", text: "How satisfied are you with your relationships?", options: [
+                    { label: "Very satisfied", value: 4, emoji: "🥰" },
+                    { label: "Satisfied", value: 3, emoji: "😊" },
+                    { label: "Neutral", value: 2, emoji: "😐" },
+                    { label: "Dissatisfied", value: 1, emoji: "😕" },
+                    { label: "Very dissatisfied", value: 0, emoji: "😢" }
+                ], section_name: "Social" },
+                { id: "energy_1", text: "How would you rate your overall energy levels?", options: [
+                    { label: "Very high energy", value: 4, emoji: "⚡" },
+                    { label: "Good energy", value: 3, emoji: "💪" },
+                    { label: "Moderate energy", value: 2, emoji: "🔋" },
+                    { label: "Low energy", value: 1, emoji: "🪫" },
+                    { label: "Very low energy", value: 0, emoji: "😴" }
+                ], section_name: "Energy" },
+                { id: "gad_4", text: "Trouble relaxing?", options: [
+                    { label: "Not at all", value: 0, emoji: "😌" },
+                    { label: "Several days", value: 1, emoji: "🌊" },
+                    { label: "More than half the days", value: 2, emoji: "🌪️" },
+                    { label: "Nearly every day", value: 3, emoji: "🚨" }
+                ], section_name: "Anxiety" },
+                { id: "phq_3", text: "Trouble falling or staying asleep, or sleeping too much?", options: [
+                    { label: "Not at all", value: 0, emoji: "😌" },
+                    { label: "Several days", value: 1, emoji: "🌊" },
+                    { label: "More than half the days", value: 2, emoji: "🌪️" },
+                    { label: "Nearly every day", value: 3, emoji: "🚨" }
+                ], section_name: "Sleep" },
+                { id: "stress_2", text: "I have felt that I was unable to control the important things in my life?", options: [
+                    { label: "Never", value: 0, emoji: "🧘" },
+                    { label: "Almost never", value: 1, emoji: "😌" },
+                    { label: "Sometimes", value: 2, emoji: "😐" },
+                    { label: "Fairly often", value: 3, emoji: "😰" },
+                    { label: "Very often", value: 4, emoji: "🤯" }
+                ], section_name: "Control" },
+                { id: "who_3", text: "I have felt active and vigorous?", options: [
+                    { label: "All of the time", value: 5, emoji: "🌟" },
+                    { label: "Most of the time", value: 4, emoji: "😊" },
+                    { label: "More than half of the time", value: 3, emoji: "⚖️" },
+                    { label: "Less than half of the time", value: 2, emoji: "☁️" },
+                    { label: "Some of the time", value: 1, emoji: "🌑" },
+                    { label: "At no time", value: 0, emoji: "😔" }
+                ], section_name: "Wellbeing" }
+            ]
         };
     }
 

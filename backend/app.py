@@ -423,6 +423,42 @@ def submit_feedback():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/api/share', methods=['POST'])
+def create_share():
+    """Create shareable results link"""
+    try:
+        data = request.get_json()
+        share_id = data.get('share_id')
+
+        # Store share data (implement your preferred storage)
+        share_data = {
+            'id': share_id,
+            'overall_score': data.get('overall_score'),
+            'assessment_mode': data.get('assessment_mode'),
+            'timestamp': data.get('timestamp'),
+            'insights': data.get('insights'),
+            'created_at': datetime.now().isoformat()
+        }
+
+        # Save to file or database
+        share_file = Config.DATA_DIR / "shared_results.jsonl"
+        with open(share_file, 'a', encoding='utf-8') as f:
+            f.write(json.dumps(share_data) + '\n')
+
+        # Return share URL
+        base_url = request.url_root.rstrip('/')
+        share_url = f"{base_url}/#shared-{share_id}"
+
+        return jsonify({
+            'success': True,
+            'share_url': share_url,
+            'share_id': share_id
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 if __name__ == '__main__':
     print("🚀 Starting MindScope Enhanced Backend")
     print(f"📊 Data directory: {Config.DATA_DIR}")

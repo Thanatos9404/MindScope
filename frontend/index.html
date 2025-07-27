@@ -4,14 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindScope - Mental Wellbeing Assessment</title>
-    <meta name="description" content="Evidence-based mental health self-assessment with personalized insights">
+    <meta name="description" content="Evidence-based mental health self-assessment with personalized insights, PDF reports, and social sharing">
+
+    <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Chart.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+    <!-- PDF Export Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+    <!-- Main Stylesheet -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Navigation - FIXED Brand Clickability -->
+    <!-- Navigation -->
     <header class="header">
         <nav class="nav">
             <div class="nav-brand" onclick="goHome()" style="cursor: pointer;">
@@ -37,7 +50,6 @@
         </nav>
     </header>
 
-
     <!-- Home Page -->
     <section id="home-page" class="page active">
         <div class="hero-section">
@@ -57,7 +69,7 @@
                         beautiful visualizations, and expert recommendations for your mental wellness journey.
                     </p>
 
-                    <!-- Benefits Section -->
+                    <!-- Enhanced Benefits Section (2x2 Grid) -->
                     <div class="benefits">
                         <div class="benefit">
                             <div class="benefit-icon">⚡</div>
@@ -88,7 +100,6 @@
                             </div>
                         </div>
                     </div>
-
 
                     <!-- Assessment Mode Selection -->
                     <div class="assessment-modes">
@@ -201,28 +212,27 @@
                         <div class="score-value" id="overall-score">85</div>
                         <div class="score-description">Above average compared to others</div>
                     </div>
+                </div>
 
-                    <!-- Chart Controls & Display - ADD THIS AFTER THE OVERALL SCORE CARD -->
-                    <div class="chart-controls">
-                        <h3>Visualize Your Results</h3>
-                        <div class="chart-tabs">
-                            <button class="chart-tab active" onclick="mindScope.switchChart('radar')">
-                                <span>📊</span> Radar View
-                            </button>
-                            <button class="chart-tab" onclick="mindScope.switchChart('donut')">
-                                <span>🍩</span> Donut Chart
-                            </button>
-                            <button class="chart-tab" onclick="mindScope.switchChart('bar')">
-                                <span>📈</span> Bar Chart
-                            </button>
-                        </div>
+                <!-- Chart Controls & Display -->
+                <div class="chart-controls">
+                    <h3>Visualize Your Results</h3>
+                    <div class="chart-tabs">
+                        <button class="chart-tab active" onclick="mindScope.switchChart('radar')">
+                            <span>📊</span> Radar View
+                        </button>
+                        <button class="chart-tab" onclick="mindScope.switchChart('donut')">
+                            <span>🍩</span> Donut Chart
+                        </button>
+                        <button class="chart-tab" onclick="mindScope.switchChart('bar')">
+                            <span>📈</span> Bar Chart
+                        </button>
                     </div>
+                </div>
 
-                    <!-- Chart Container -->
-                    <div class="chart-container">
-                        <canvas id="results-chart" width="400" height="300"></canvas>
-                    </div>
-
+                <!-- Chart Container -->
+                <div class="chart-container">
+                    <canvas id="results-chart" width="400" height="300"></canvas>
                 </div>
 
                 <!-- Results Grid -->
@@ -254,7 +264,7 @@
                         Share Results
                     </button>
 
-                    <button class="btn btn-primary" onclick="showPage('home')">
+                    <button class="btn btn-primary" onclick="goHome()">
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                         </svg>
@@ -380,16 +390,76 @@
                 </div>
 
                 <div class="resources-actions">
-                    <button class="btn btn-secondary" onclick="showPage('home')">Back to Home</button>
-                    <button class="btn btn-primary" onclick="showPage('assessment')">Take Assessment</button>
+                    <button class="btn btn-secondary" onclick="goHome()">Back to Home</button>
+                    <button class="btn btn-primary" onclick="scrollToAssessment()">Take Assessment</button>
                 </div>
             </div>
         </div>
     </section>
 
-    <script src="script.js"></script>
-    <!-- Make sure this is in your HTML head section -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <!-- Enhanced Share Modal -->
+    <div class="modal" id="share-modal">
+        <div class="modal-overlay" onclick="mindScope.closeShareModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🔗 Share Your Wellness Journey</h3>
+                <button class="modal-close" onclick="mindScope.closeShareModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Inspire others by sharing your mental wellness check-in! Your specific results remain private.</p>
 
+                <!-- Native Share (mobile) -->
+                <div class="native-share" id="native-share" style="display: none;">
+                    <button class="share-btn native" onclick="mindScope.shareNative()">
+                        <span>📱</span> Share via Device
+                    </button>
+                </div>
+
+                <!-- Social Platform Options -->
+                <div class="share-options">
+                    <button class="share-btn twitter" onclick="mindScope.shareToTwitter()">
+                        <span>🐦</span> Share on Twitter
+                    </button>
+                    <button class="share-btn linkedin" onclick="mindScope.shareToLinkedIn()">
+                        <span>💼</span> Share on LinkedIn
+                    </button>
+                    <button class="share-btn whatsapp" onclick="mindScope.shareToWhatsApp()">
+                        <span>📱</span> Share on WhatsApp
+                    </button>
+                    <button class="share-btn facebook" onclick="mindScope.shareToFacebook()">
+                        <span>📘</span> Share on Facebook
+                    </button>
+                    <button class="share-btn copy" onclick="mindScope.copyShareLink()">
+                        <span>🔗</span> Copy Link
+                    </button>
+                </div>
+
+                <!-- Share Link -->
+                <div class="share-link-container">
+                    <label for="share-link-input">Direct Link:</label>
+                    <input type="text" id="share-link-input" readonly placeholder="Generating share link...">
+                </div>
+
+                <!-- Privacy Note -->
+                <div class="privacy-note">
+                    <small>🔒 <strong>Privacy:</strong> Only your overall score and general insights are shared. Detailed responses remain private.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main JavaScript -->
+    <script src="script.js"></script>
+
+    <!-- Mobile Native Share Detection -->
+    <script>
+        // Show native share option on mobile devices
+        if (navigator.share) {
+            const nativeShare = document.getElementById('native-share');
+            if (nativeShare) {
+                nativeShare.style.display = 'block';
+            }
+        }
+    </script>
 </body>
 </html>

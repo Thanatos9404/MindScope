@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindScope - Mental Wellbeing Assessment</title>
+    <meta name="description" content="Evidence-based mental health self-assessment with personalized insights">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation - FIXED Brand Clickability -->
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-brand" onclick="goHome()" style="cursor: pointer;">
+                <div class="logo">
+                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                        <defs>
+                            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#6366F1"/>
+                                <stop offset="100%" style="stop-color:#8B5CF6"/>
+                            </linearGradient>
+                        </defs>
+                        <path d="M14 0C21.732 0 28 6.268 28 14s-6.268 14-14 14S0 21.732 0 14 6.268 0 14 0zm0 8a6 6 0 100 12 6 6 0 000-12z" fill="url(#logoGradient)"/>
+                    </svg>
+                </div>
+                <span class="brand-name">MindScope</span>
+                <span class="brand-tagline">by YT</span>
+            </div>
+            <div class="nav-links">
+                <button class="nav-link" onclick="goHome()">Home</button>
+                <button class="nav-link" onclick="scrollToAssessment()">Assessment</button>
+                <button class="nav-link" onclick="showPage('resources')">Resources</button>
+            </div>
+        </nav>
+    </header>
+
+
+    <!-- Home Page -->
+    <section id="home-page" class="page active">
+        <div class="hero-section">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <span>✨ Enhanced with AI-powered insights</span>
+                    </div>
+
+                    <h1 class="hero-title">
+                        Check in with your
+                        <span class="text-gradient">Mental Health</span>
+                    </h1>
+
+                    <p class="hero-description">
+                        Take a moment for yourself with our evidence-based assessment. Get personalized insights,
+                        beautiful visualizations, and expert recommendations for your mental wellness journey.
+                    </p>
+
+                    <!-- Benefits Section -->
+                    <div class="benefits">
+                        <div class="benefit">
+                            <div class="benefit-icon">⚡</div>
+                            <div>
+                                <h4>Quick or Comprehensive</h4>
+                                <p>Choose between a 5-minute quick check or full 15-minute assessment</p>
+                            </div>
+                        </div>
+                        <div class="benefit">
+                            <div class="benefit-icon">📊</div>
+                            <div>
+                                <h4>Beautiful Visualizations</h4>
+                                <p>See your results in interactive charts and personalized reports</p>
+                            </div>
+                        </div>
+                        <div class="benefit">
+                            <div class="benefit-icon">🎯</div>
+                            <div>
+                                <h4>Expert Recommendations</h4>
+                                <p>Get tailored suggestions based on evidence-based practices</p>
+                            </div>
+                        </div>
+                        <div class="benefit">
+                            <div class="benefit-icon">🔒</div>
+                            <div>
+                                <h4>Private & Secure</h4>
+                                <p>Your data stays private with optional sharing and PDF export</p>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Assessment Mode Selection -->
+                    <div class="assessment-modes">
+                        <h3>How would you like to check in today?</h3>
+                        <div class="mode-cards">
+                            <div class="mode-card" onclick="window.mindScope.startAssessment('quick')">
+                                <div class="mode-icon">⚡</div>
+                                <h4>Quick Check-in</h4>
+                                <p>A focused assessment with 10-12 carefully selected questions covering all key areas of mental wellness.</p>
+                                <span class="mode-time">~5 minutes</span>
+                                <button class="btn btn-secondary">Start Quick Assessment</button>
+                            </div>
+
+                            <div class="mode-card featured" onclick="window.mindScope.startAssessment('full')">
+                                <div class="mode-badge">Recommended</div>
+                                <div class="mode-icon">🧠</div>
+                                <h4>Complete Wellness Check</h4>
+                                <p>Comprehensive 35-question assessment providing detailed insights across all mental health domains.</p>
+                                <span class="mode-time">~15 minutes</span>
+                                <button class="btn btn-primary">Start Full Assessment</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Assessment Page -->
+    <section id="assessment-page" class="page">
+        <div class="assessment-container">
+            <div class="container">
+                <!-- Assessment Header -->
+                <div class="assessment-header">
+                    <div class="assessment-mode-badge" id="assessment-mode-badge">
+                        <span id="mode-text">Assessment Mode</span>
+                    </div>
+                    <h1>Mental Health Assessment</h1>
+                    <p class="question-counter">
+                        Question <span id="current-question">1</span> of <span id="total-questions">12</span>
+                    </p>
+                </div>
+
+                <!-- Enhanced Progress Bar -->
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                        <div class="progress-glow" id="progress-glow"></div>
+                    </div>
+                    <div class="progress-info">
+                        <span class="progress-text"><span id="progress-percent">8</span>% complete</span>
+                        <span class="progress-time">~<span id="estimated-time">12</span> min remaining</span>
+                    </div>
+                </div>
+
+                <!-- Question Card -->
+                <div class="question-card">
+                    <div class="question-section" id="question-section"></div>
+                    <h2 class="question-text" id="question-text">
+                        Loading your personalized assessment...
+                    </h2>
+                    <div class="answer-options" id="answer-options">
+                        <!-- Options populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="assessment-navigation">
+                    <button class="btn btn-ghost" id="prev-btn" onclick="previousQuestion()" disabled>
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                            <path d="M11.25 13.5l-4.5-4.5 4.5-4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Previous
+                    </button>
+
+                    <div class="question-dots" id="question-dots">
+                        <!-- Dots generated by JavaScript -->
+                    </div>
+
+                    <div class="nav-spacer"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enhanced Results Page -->
+    <section id="results-page" class="page">
+        <div class="results-container">
+            <div class="container">
+                <!-- Results Header -->
+                <div class="results-header">
+                    <div class="completion-celebration">
+                        <div class="completion-icon">
+                            <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                                <circle cx="32" cy="32" r="30" stroke="url(#logoGradient)" stroke-width="2" fill="none"/>
+                                <path d="M20 32l8 8 16-16" stroke="url(#logoGradient)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="celebration-particles" id="celebration-particles"></div>
+                    </div>
+
+                    <h1>Your Wellness Insights</h1>
+                    <p class="results-subtitle">
+                        Based on your responses, here's your personalized mental health profile.
+                        Remember, this is a snapshot of your current state and a starting point for your wellness journey.
+                    </p>
+
+                    <div class="overall-score-card">
+                        <div class="score-label">Overall Wellness Score</div>
+                        <div class="score-value" id="overall-score">85</div>
+                        <div class="score-description">Above average compared to others</div>
+                    </div>
+
+                    <!-- Chart Controls & Display - ADD THIS AFTER THE OVERALL SCORE CARD -->
+                    <div class="chart-controls">
+                        <h3>Visualize Your Results</h3>
+                        <div class="chart-tabs">
+                            <button class="chart-tab active" onclick="mindScope.switchChart('radar')">
+                                <span>📊</span> Radar View
+                            </button>
+                            <button class="chart-tab" onclick="mindScope.switchChart('donut')">
+                                <span>🍩</span> Donut Chart
+                            </button>
+                            <button class="chart-tab" onclick="mindScope.switchChart('bar')">
+                                <span>📈</span> Bar Chart
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Chart Container -->
+                    <div class="chart-container">
+                        <canvas id="results-chart" width="400" height="300"></canvas>
+                    </div>
+
+                </div>
+
+                <!-- Results Grid -->
+                <div class="results-grid" id="results-grid">
+                    <!-- Results cards populated by JavaScript -->
+                </div>
+
+                <!-- Enhanced Recommendations -->
+                <div class="recommendations" id="recommendations">
+                    <h2>Your Personalized Action Plan</h2>
+                    <div class="recommendations-grid" id="recommendations-grid">
+                        <!-- Recommendations populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="results-actions">
+                    <button class="btn btn-outline" onclick="mindScope.exportPDF()">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        Download Report
+                    </button>
+
+                    <button class="btn btn-secondary" onclick="mindScope.shareResults()">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"/>
+                        </svg>
+                        Share Results
+                    </button>
+
+                    <button class="btn btn-primary" onclick="showPage('home')">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        Take Another Assessment
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resources Page - Updated for India -->
+    <section id="resources-page" class="page">
+        <div class="resources-container">
+            <div class="container">
+                <div class="resources-header">
+                    <h1>Mental Health Resources</h1>
+                    <p>Curated resources to support your mental health journey in India. Remember, seeking help is a sign of strength.</p>
+                </div>
+
+                <!-- Emergency Section -->
+                <div class="emergency-section">
+                    <div class="emergency-card">
+                        <div class="emergency-content">
+                            <h3>🚨 Need Immediate Help?</h3>
+                            <p>If you're having thoughts of suicide or self-harm, please reach out immediately. You are not alone.</p>
+                            <div class="emergency-contacts">
+                                <div class="contact-item">
+                                    <strong>KIRAN Mental Health Helpline:</strong> 1800-599-0019
+                                </div>
+                                <div class="contact-item">
+                                    <strong>Vandrevala Foundation:</strong> 9999 666 555
+                                </div>
+                                <div class="contact-item">
+                                    <strong>AASRA Suicide Prevention:</strong> +91 9820466726
+                                </div>
+                                <div class="contact-item">
+                                    <strong>Emergency Services:</strong> 112
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resource Categories -->
+                <div class="resource-categories">
+                    <div class="resource-category">
+                        <h2>Professional Support</h2>
+                        <div class="resource-grid">
+                            <div class="resource-card">
+                                <div class="resource-icon">👩‍⚕️</div>
+                                <h4>Find a Therapist</h4>
+                                <p>Locate licensed mental health professionals in your city across India.</p>
+                                <a href="https://www.practo.com/bangalore/therapist" class="resource-link" target="_blank">Practo - Mental Health</a>
+                            </div>
+
+                            <div class="resource-card">
+                                <div class="resource-icon">💊</div>
+                                <h4>Psychiatric Services</h4>
+                                <p>Connect with psychiatrists for medication management and specialized care.</p>
+                                <a href="https://www.1mg.com/doctors/psychiatrist" class="resource-link" target="_blank">1mg Psychiatrists</a>
+                            </div>
+
+                            <div class="resource-card">
+                                <div class="resource-icon">📞</div>
+                                <h4>Teletherapy Platforms</h4>
+                                <p>Access therapy from home with Indian mental health platforms.</p>
+                                <a href="https://www.betterlyf.com/" class="resource-link" target="_blank">BetterLYF</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="resource-category">
+                        <h2>Indian Mental Health Organizations</h2>
+                        <div class="resource-grid">
+                            <div class="resource-card">
+                                <div class="resource-icon">🏥</div>
+                                <h4>NIMHANS</h4>
+                                <p>National Institute of Mental Health and Neurosciences - Leading mental health institute.</p>
+                                <a href="https://nimhans.ac.in/" class="resource-link" target="_blank">Visit NIMHANS</a>
+                            </div>
+
+                            <div class="resource-card">
+                                <div class="resource-icon">🤝</div>
+                                <h4>The Live Love Laugh Foundation</h4>
+                                <p>Reducing stigma around mental health awareness in India.</p>
+                                <a href="https://www.thelivelovelaughfoundation.org/" class="resource-link" target="_blank">LLL Foundation</a>
+                            </div>
+
+                            <div class="resource-card">
+                                <div class="resource-icon">📱</div>
+                                <h4>Mental Health Apps</h4>
+                                <p>Indian apps for mood tracking, meditation, and mental wellness.</p>
+                                <a href="https://innerhourindia.com/" class="resource-link" target="_blank">InnerHour</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="resource-category">
+                        <h2>Self-Help & Support Groups</h2>
+                        <div class="resource-grid">
+                            <div class="resource-card">
+                                <div class="resource-icon">🧘‍♀️</div>
+                                <h4>Meditation & Mindfulness</h4>
+                                <p>Indian meditation apps and mindfulness resources.</p>
+                                <a href="https://play.google.com/store/apps/details?id=com.headspace.android" class="resource-link" target="_blank">Headspace India</a>
+                            </div>
+
+                            <div class="resource-card">
+                                <div class="resource-icon">👥</div>
+                                <h4>Support Groups</h4>
+                                <p>Connect with local support groups and communities across Indian cities.</p>
+                                <a href="https://www.reddit.com/r/india/" class="resource-link" target="_blank">r/india Mental Health</a>
+                            </div>
+
+                            <div class="resource-card">
+                                <div class="resource-icon">📚</div>
+                                <h4>Educational Resources</h4>
+                                <p>Learn about mental health through Indian context and cultural resources.</p>
+                                <a href="https://www.mpower1.org/" class="resource-link" target="_blank">Mpower - The Centre</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resources-actions">
+                    <button class="btn btn-secondary" onclick="showPage('home')">Back to Home</button>
+                    <button class="btn btn-primary" onclick="showPage('assessment')">Take Assessment</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+    <!-- Make sure this is in your HTML head section -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+</body>
+</html>

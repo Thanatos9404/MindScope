@@ -1,0 +1,87 @@
+{
+    "title": "Your Inner Compass: A Well-being Reflection",
+    "description": "This check-in is a gentle invitation to explore your emotional landscape. Take a moment to truly feel into how you've been experiencing life over the **last 2 weeks** (unless a question guides you to a different timeframe). Your authentic reflection is your greatest guide here.",
+    "option_sets": {
+        "spectrum_of_presence_0_3": [
+            {"label": "A quiet presence, barely a whisper in my days.", "value": 0, "emoji": "😌"},
+            {"label": "A gentle ripple, sometimes felt, but I navigate through it.", "value": 1, "emoji": "🌊"},
+            {"label": "A noticeable current, often present, making things challenging.", "value": 2, "emoji": "🌪️"},
+            {"label": "A powerful tide, almost constant, shaping nearly every moment.", "value": 3, "emoji": "🚨"}
+        ],
+        "wellbeing_flow_0_5": [
+            {"label": "A deep, consistent sense of peace and flourishing.", "value": 5, "emoji": "🌟"},
+            {"label": "Often present, with many moments of calm and joy.", "value": 4, "emoji": "😊"},
+            {"label": "Some ups and downs, finding my balance in the flow of life.", "value": 3, "emoji": "⚖️"},
+            {"label": "Moments of struggle are noticeable, seeking more light.", "value": 2, "emoji": "☁️"},
+            {"label": "Rarely felt, a challenge to find even a flicker.", "value": 1, "emoji": "🌑"}
+        ],
+        "coping_strategy_0_3": [
+            {"label": "Never. I avoid using substances to cope.", "value": 0, "emoji": "🌿"},
+            {"label": "Rarely. Only on very isolated occasions.", "value": 1, "emoji": "💧"},
+            {"label": "Sometimes. I notice it happening occasionally to manage feelings.", "value": 2, "emoji": "🥃"},
+            {"label": "Often. It's a frequent way I try to cope or escape.", "value": 3, "emoji": "🚨"}
+        ]
+    },
+    "sections": [
+        {
+            "category": "Mind & Mood",
+            "intro": "Let's check in with your thoughts and feelings...",
+            "model_target": "Depression_Category",
+            "questions": [
+                {"id": "phq_1", "text": "Little interest or pleasure in doing things?", "options_id": "spectrum_of_presence_0_3", "model_target": "Depression_Score"},
+                {"id": "phq_2", "text": "Feeling down, depressed, or hopeless?", "options_id": "spectrum_of_presence_0_3", "model_target": "Depression_Score"},
+                {"id": "phq_3", "text": "Trouble falling or staying asleep, or sleeping too much?", "options_id": "spectrum_of_presence_0_3", "model_target": "Depression_Score"},
+                {"id": "phq_4", "text": "Feeling tired or having little energy?", "options_id": "spectrum_of_presence_0_3", "model_target": "Depression_Score"},
+                {"id": "phq_5", "text": "Poor appetite or overeating?", "options_id": "spectrum_of_presence_0_3", "model_target": "Depression_Score"},
+                {"id": "phq_6", "text": "Feeling bad about yourself—or that you are a failure or have let yourself or your family down?", "options_id": "spectrum_of_presence_0_3", "model_target": "Depression_Score"},
+                {"id": "phq_7", "text": "Trouble concentrating on things, such as reading the newspaper or watching television?", "options_id": "spectrum_of_presence_0_3", "model_target": "Depression_Score"},
+                {"id": "phq_8", "text": "Moving or speaking so slowly that other people could have noticed? Or the opposite—being so fidgety or restless that you have been moving a lot more than usual?", "options_id": "spectrum_of_presence_0_3", "model_target": "Depression_Score"},
+                {"id": "gad_1", "text": "Feeling nervous, anxious, or on edge?", "options_id": "spectrum_of_presence_0_3", "model_target": "Anxiety_Score"},
+                {"id": "gad_2", "text": "Not being able to stop or control worrying?", "options_id": "spectrum_of_presence_0_3", "model_target": "Anxiety_Score"},
+                {"id": "gad_3", "text": "Worrying too much about different things?", "options_id": "spectrum_of_presence_0_3", "model_target": "Anxiety_Score"},
+                {"id": "gad_4", "text": "Trouble relaxing?", "options_id": "spectrum_of_presence_0_3", "model_target": "Anxiety_Score"},
+                {"id": "gad_5", "text": "Being so restless that it's hard to sit still?", "options_id": "spectrum_of_presence_0_3", "model_target": "Anxiety_Score"},
+                {"id": "gad_6", "text": "Becoming easily annoyed or irritable?", "options_id": "spectrum_of_presence_0_3", "model_target": "Anxiety_Score"},
+                {"id": "gad_7", "text": "Feeling afraid as if something awful might happen?", "options_id": "spectrum_of_presence_0_3", "model_target": "Anxiety_Score"},
+                {"id": "dass_s_1", "text": "I found it hard to wind down", "options_id": "spectrum_of_presence_0_3", "model_target": "Stress_Score"},
+                {"id": "dass_s_2", "text": "I tended to over-react to situations", "options_id": "spectrum_of_presence_0_3", "model_target": "Stress_Score"},
+                {"id": "dass_s_3", "text": "I experienced trembling (e.g. in the hands)", "options_id": "spectrum_of_presence_0_3", "model_target": "Stress_Score"},
+                {"id": "dass_s_4", "text": "I was aware of dryness of my mouth", "options_id": "spectrum_of_presence_0_3", "model_target": "Stress_Score"},
+                {"id": "dass_s_5", "text": "I found it difficult to relax", "options_id": "spectrum_of_presence_0_3", "model_target": "Stress_Score"},
+                {"id": "dass_s_6", "text": "I felt that I was rather touchy", "options_id": "spectrum_of_presence_0_3", "model_target": "Stress_Score"},
+                {"id": "dass_s_7", "text": "I found myself getting agitated", "options_id": "spectrum_of_presence_0_3", "model_target": "Stress_Score"}
+            ]
+        },
+        {
+            "category": "Energy & Sleep",
+            "intro": "How has your energy been, and what about your sleep?",
+            "model_target": "Wellbeing_Category",
+            "questions": [
+                {"id": "sleep_1", "text": "Do you often wake up feeling refreshed and ready for the day?", "options_id": "wellbeing_flow_0_5", "model_target": "Sleep_Quality_Score"},
+                {"id": "sleep_2", "text": "Do you typically get enough hours of sleep?", "options_id": "wellbeing_flow_0_5", "model_target": "Sleep_Quality_Score"},
+                {"id": "sleep_3", "text": "Do you usually fall asleep within 30 minutes of going to bed?", "options_id": "wellbeing_flow_0_5", "model_target": "Sleep_Quality_Score"},
+                {"id": "sleep_4", "text": "Do you stay asleep through the night without significant interruptions?", "options_id": "wellbeing_flow_0_5", "model_target": "Sleep_Quality_Score"},
+                {"id": "sleep_5", "text": "Do you feel your sleep is generally good quality?", "options_id": "wellbeing_flow_0_5", "model_target": "Sleep_Quality_Score"},
+                {"id": "who_1", "text": "I have felt cheerful and in good spirits?", "options_id": "wellbeing_flow_0_5", "model_target": "Wellbeing_Score"},
+                {"id": "who_2", "text": "I have felt calm and relaxed?", "options_id": "wellbeing_flow_0_5", "model_target": "Wellbeing_Score"},
+                {"id": "who_3", "text": "I have felt active and vigorous?", "options_id": "wellbeing_flow_0_5", "model_target": "Wellbeing_Score"},
+                {"id": "who_4", "text": "I woke up feeling fresh and rested?", "options_id": "wellbeing_flow_0_5", "model_target": "Wellbeing_Score"},
+                {"id": "who_5", "text": "My daily life has been filled with things that interest me?", "options_id": "wellbeing_flow_0_5", "model_target": "Wellbeing_Score"}
+            ]
+        },
+        {
+            "category": "Coping & Connection",
+            "intro": "Let's reflect on how you've been navigating challenges and connecting with your world.",
+            "model_target": "Overall_Wellbeing_Category",
+            "questions": [
+                {"id": "coping_1", "text": "When difficult feelings arise, have you found yourself leaning on substances (like alcohol, drugs, or even excessive caffeine/sugar) to cope or numb the intensity?", "options_id": "coping_strategy_0_3", "model_target": "Coping_Mechanism_Score"},
+                {"id": "coping_2", "text": "Have you felt a growing distance from others, even when you're physically present or connected online, as if you're watching life from behind a pane of glass?", "options_id": "spectrum_of_presence_0_3", "model_target": "Social_Support_Score"},
+                {"id": "coping_3", "text": "Do you sometimes feel a sense of unreality, as if you're detached from your body, your emotions, or that the world around you doesn't quite feel real?", "options_id": "spectrum_of_presence_0_3", "model_target": "Social_Support_Score"}
+            ]
+        }
+    ],
+    "final_reflection_prompt": {
+        "title": "A Moment for Reflection",
+        "text": "As you complete this check-in, take a deep breath. What's one feeling or insight that stands out for you right now? Remember, acknowledging your inner landscape is a powerful step towards nurturing your well-being. This is your space, your journey."
+    }
+}
